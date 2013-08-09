@@ -22,3 +22,23 @@ if ['app_master', 'app'].include?(node[:instance_role])
     end
   end
 end
+
+if ['solo'].include?(node[:instance_role])
+  redis_instance = node['engineyard']['environment']['instances'].first
+
+  if redis_instance
+    node[:applications].each do |app, data|
+      template "/data/#{app}/shared/config/redis.yml"do
+        source 'redis.yml.erb'
+        owner node[:owner_name]
+        group node[:owner_name]
+        mode 0655
+        backup 0
+        variables({
+          :environment => node[:environment][:framework_env],
+          :hostname => redis_instance[:private_hostname]
+        })
+      end
+    end
+  end
+end
