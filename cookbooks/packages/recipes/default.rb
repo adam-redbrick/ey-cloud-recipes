@@ -20,3 +20,14 @@ node[:packages].each do |package|
 
 end
 
+enable_package "dev-libs/openssl" do
+  version "1.0.1i"
+  unmask true
+  override_hardmask
+end
+
+package "dev-libs/openssl" do
+  version "1.0.1i"
+  action :install
+end
+

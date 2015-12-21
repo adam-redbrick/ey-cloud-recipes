@@ -47,7 +47,7 @@
 
 #uncomment to install specified packages
 # You must add your packages to packages/attributes/packages.rb
-#require_recipe "packages"
+require_recipe "packages"
 
 #uncomment to add specified cron jobs for application user (deploy)
 # You must add your cron jobs to cron/attributes/cron.rb
@@ -64,7 +64,7 @@ include_recipe "resque"
 include_recipe "redis-yml"
 
 #uncomment to run the resque-scheduler recipe
-# include_recipe "resque-scheduler"
+include_recipe "resque-scheduler"
 
 #uncomment to run the redis recipe
 include_recipe "redis"
@@ -92,7 +92,7 @@ include_recipe "redis"
 #include_recipe "mysql_administrative_tools"
 
 #uncomment to include the Elasticsearch recipe
-#include_recipe "elasticsearch"
+include_recipe "elasticsearch::non_util"
 
 # To install specific plugins to Elasticsearch see below as an example
 #es_plugin "cloud-aws" do
@@ -158,3 +158,16 @@ include_recipe "redis"
   # postgresql9_pg_buffercache "postgres"
   # postgresql9_pg_freespacemap "postgres"
 # end
+
+if ['solo','app'].include?(node[:instance_role])
+  service "nginx"
+
+  nginx_config_file = "/etc/nginx/servers/justa.ssl.conf"
+
+  execute "enable nginx" do 
+    command "sed -i 's/listen.*;/listen 443 ssl spdy;/' #{nginx_config_file}" 
+    only_if { ::File.exists?(nginx_config_file) }
+    action :run
+    notifies :reload, resources(:service => "nginx")
+  end
+end

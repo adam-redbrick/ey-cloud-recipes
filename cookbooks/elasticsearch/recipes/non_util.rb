@@ -21,8 +21,8 @@ if ['solo','app_master'].include?(node[:instance_role])
   # Update JAVA as the Java on the AMI can sometimes crash
   #
   Chef::Log.info "Updating Sun JDK"
-  package "dev-java/sun-jdk" do
-    version "1.6.0.26"
+  package "dev-java/icedtea-bin" do
+    version "6.1.12.6"
     action :upgrade
   end
 
